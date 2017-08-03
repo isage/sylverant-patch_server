@@ -47,7 +47,7 @@
 
 #include <sylverant/config.h>
 #include <sylverant/debug.h>
-#include <sylverant/mtwist.h>
+#include <sylverant/pcg_basic.h>
 #include <sylverant/encryption.h>
 #include <sylverant/checksum.h>
 
@@ -121,8 +121,8 @@ static patch_client_t *create_connection(int sock, int type,
     }
 
     /* Generate the encryption keys for the client and server. */
-    cvect = (uint32_t)genrand_int32();
-    svect = (uint32_t)genrand_int32();
+    cvect = pcg32_random();
+    svect = pcg32_random();
 
     CRYPT_CreateKeys(&rv->client_cipher, &cvect, CRYPT_PC);
     CRYPT_CreateKeys(&rv->server_cipher, &svect, CRYPT_PC);
@@ -1171,7 +1171,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Initialize the random-number generator. */
-    init_genrand(time(NULL));
+    pcg32_srandom(time(NULL), 42);
 
     /* Install the SIGHUP signal handler. */
     install_signal_handler();
